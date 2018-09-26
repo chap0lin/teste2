@@ -1,0 +1,412 @@
+<!--<button onclick="myAudio.pause()">||</button>
+<button onclick="myAudio.play()">^</button>
+<br>-->
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF8">
+</head>
+<p id="xd"></p>
+<p id="pontuacao"></p>
+<canvas id="gc" width="900" height="600" style="margin-left: 25vw; margin-top:10vh;"></canvas>
+<script>
+window.onload=function() {
+    canv=document.getElementById("gc");
+    ctx=canv.getContext("2d");
+    document.addEventListener("keydown",keyPush);
+    document.addEventListener("keyup",keyRelesed);
+    canv.addEventListener("mousedown",mouseClick);
+    setInterval(game,1000/15);
+}
+mox = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+moy = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+moalpha = [1,1,1,1,1,1,1,1,1,1];
+px=410;
+py=260;
+pontos = 0;
+ex=0;
+ey=50;
+step=20;
+glucoCount = 0;
+//tc=20;
+//ax=ay=15;
+xv=yv=0;
+trail=[];
+tail = 5;
+clicou = false;
+var mousexy;
+stage = 1;//1 e o nivel 1, 2 e a explicacao
+
+
+var myImage = new Image(80,80);
+myImage.src = 'c1.png';
+var enemy = new Image(80,80);
+enemy.src = 'e1.png';
+var comida = new Image(20,20);
+comida.src = 'Glicose.png';
+var fundo = new Image(1800,1500);
+fundo.src = 'back.png';
+var f0 = new Image(425,400);
+f0.src="f0.png";
+var f1 = new Image(425,400);
+f1.src="f1.png";
+var atp = new Image(30,26);
+atp.src = "atp.png";
+var f2 = new Image(425,200);
+f2.src = "a2.png";
+var o1 = new Image(425,200);
+o1.src = "o1.png";
+var o1c = new Image(425,200);
+o1c.src = "o1c.png";
+fade = 1;
+/*
+var myAudio = new Audio('music.mp3');
+myAudio.play();*/
+
+function game() {
+	if(stage == -1){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+
+		ctx.fillStyle = "white";
+		ctx.fillRect(200,80,500,450);
+
+		ctx.drawImage(f2,220,100,460,200);
+
+		if(fade >=0.1){
+			ctx.globalAlpha = fade;
+			ctx.drawImage(comida,410,350,80,80);
+			ctx.globalAlpha = 1;
+			fade -= 0.05;
+		}else{
+			ctx.drawImage(atp,400,350,100,80);
+		}
+		if(clicou){
+			document.getElementById("xd").innerHTML = mousexy;
+			stage=1.5;
+			clicou = false;
+		}
+
+	}
+	else if(stage == 0){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Fim de jogo!";
+	    ctx.fillText(hudtext,200,200);
+	    hudtext = "Pontua\ção final: " + 2*pontos;
+	    ctx.fillText(hudtext,200,300);
+	    if(clicou){
+	    	stage = 1;
+	    	clicou = false;
+	    	px=410;
+			py=260;
+			pontos = 0;
+			ex=0;
+			ey=50;
+	    }
+		
+	}else if(stage == 1){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f0,237.5,100,425,400);
+		if(clicou){
+			document.getElementById("xd").innerHTML = mousexy;
+			stage=-1;
+			clicou = false;
+		}
+	}else if(stage == 1.5){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o1,237.5,100,425,400);
+		if(clicou){
+			stage=2;
+			clicou = false;
+		}
+	}else if(stage == 2){
+	    px+=xv*step;
+	    py+=yv*step;
+	    if(px<410) {
+	        px=410;
+	    }
+	    if(px>1310) {
+	        px= 1310;
+	    }
+	    if(py<270) {
+	        py= 270;
+	    }
+	    if(py>1160) {
+	        py= 1160;
+	    }
+	    ctx.fillStyle="black";
+	    cx = px-410;
+	    cy = py-260;
+	    ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+	    //ctx.fillRect(0,0,canv.width,canv.height);
+	    //ctx.drawImage(myImage,ax*gs,ay*gs,gs-2,gs-2);
+	
+
+	    ctx.drawImage(myImage,410,260,80,80);
+
+	    //colisao glicose:
+	    for(var i=0;i<10;i++){
+	    	if(mox[i]>= px && mox[i] <=px+80 && moy[i]>= py && moy[i] <=py+80){
+	    		//mox[i]=-1;
+	    		//moy[i]=-1;
+	    		moalpha[i] = 0.9;
+	    		//glucoCount--;
+	    		//pontos++;
+	    		break;
+	    	}
+	    	if(moalpha[i]!=1){
+	    		moalpha[i]-=0.1;
+	    		if(moalpha[i]<=0){
+	    			//document.getElementById("pontuacao").innerHTML = "sumiu";
+	    			mox[i]=-1;
+	    			moy[i]=-1;
+	    			pontos++;
+	    			moalpha[i]=1;
+	    			glucoCount--;
+	    		}
+	    	}
+	    }
+
+	    //spawn de glicose
+	    if(glucoCount<8)
+	    {
+	    	if(Math.random()>0.96 || glucoCount == 0){
+	    		//spawna
+	    		for(var i=0;i<10;i++){
+	    			if(mox[i] == -1)
+	    				break;
+	    		}
+	    		mox[i] = (Math.random()*10000)%880 + 420;
+	    		moy[i] = (Math.random()*10000)%890 + 270;
+	    		glucoCount++;
+	    	}
+	    }
+	    document.getElementById("xd").innerHTML = glucoCount;
+	    document.getElementById("pontuacao").innerHTML = pontos;
+	    //console.log("")
+	    for(var i=0;i<10;i++){
+	    	if(moalpha[i] <= 0.3){
+	    		ctx.drawImage(atp,mox[i]-cx,moy[i]-cy,60,50);
+	    	}
+	    	else if(mox[i] != -1){
+	    		ctx.globalAlpha = moalpha[i];
+	    		ctx.drawImage(comida,mox[i]-cx,moy[i]-cy,20,20);
+	    	}
+	    }
+	    ctx.globalAlpha = 1;
+
+	    //update do enemy
+	    if(ex<px)
+	        ex+=5;
+	    else if(ex>px)
+	        ex-=5;
+	    if(ey<py)
+	        ey+=5;
+	    else if(ey>py)
+	        ey-=5;
+	    //if(Math.abs(ex-px)<300 && Math.abs(ey-py)<300)
+	    ctx.drawImage(enemy,ex-cx,ey-cy,100,100);
+
+	    ctx.fillStyle="green";
+	    ctx.fillRect(0,0,canv.width,50);
+	    ctx.fillStyle ="black";
+	    ctx.font="20px Calibri";
+	    hudtext = "ATP: " + 2*pontos;
+	    ctx.fillText(hudtext,25,30);
+
+
+	    if(ex>=px-90 && ex<=px+70 && ey>=py-90 && ey<=py+70){//o certo e 100 e 80
+	    	document.getElementById("xd").innerHTML = "gameover";
+	    	stage = 0;
+	    }
+	    if(pontos >= 20){
+	    	stage = 2.5;
+	    }
+	    //ctx.fillRect(px*step,py*step,20,20);
+	}else if(stage == 2.5){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o1c,237.5,100,425,400);
+	    if(clicou){
+	    	stage = 3;
+	    	clicou = false;
+	    }
+	}else if(stage == 3){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f1,237.5,100,425,400);
+	    if(clicou){
+	    	stage = 4;
+	    	clicou = false;
+	    	px=410;
+			py=260;
+			pontos = 0;
+			ex=0;
+			ey=50;
+	    }
+	}else if(stage == 4){
+		px+=xv*step;
+	    py+=yv*step;
+	    if(px<410) {
+	        px=410;
+	    }
+	    if(px>1310) {
+	        px= 1310;
+	    }
+	    if(py<270) {
+	        py= 270;
+	    }
+	    if(py>1160) {
+	        py= 1160;
+	    }
+	    ctx.fillStyle="black";
+	    cx = px-410;
+	    cy = py-260;
+	    ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+	    //ctx.fillRect(0,0,canv.width,canv.height);
+	    //ctx.drawImage(myImage,ax*gs,ay*gs,gs-2,gs-2);
+	
+
+	    ctx.drawImage(myImage,410,260,80,80);
+
+	    //colisao glicose:
+	    for(var i=0;i<10;i++){
+	    	if(mox[i]>= px && mox[i] <=px+80 && moy[i]>= py && moy[i] <=py+80){
+	    		//mox[i]=-1;
+	    		//moy[i]=-1;
+	    		moalpha[i] = 0.9;
+	    		//glucoCount--;
+	    		//pontos++;
+	    		break;
+	    	}
+	    	if(moalpha[i]!=1){
+	    		moalpha[i]-=0.1;
+	    		if(moalpha[i]<=0){
+	    			//document.getElementById("pontuacao").innerHTML = "sumiu";
+	    			mox[i]=-1;
+	    			moy[i]=-1;
+	    			pontos++;
+	    			moalpha[i]=1;
+	    			glucoCount--;
+	    		}
+	    	}
+	    }
+
+	    //spawn de glicose
+	    if(glucoCount<8)
+	    {
+	    	if(Math.random()>0.96 || glucoCount == 0){
+	    		//spawna
+	    		for(var i=0;i<10;i++){
+	    			if(mox[i] == -1)
+	    				break;
+	    		}
+	    		mox[i] = (Math.random()*10000)%880 + 420;
+	    		moy[i] = (Math.random()*10000)%890 + 270;
+	    		glucoCount++;
+	    	}
+	    }
+	    document.getElementById("xd").innerHTML = glucoCount;
+	    document.getElementById("pontuacao").innerHTML = pontos;
+	    //console.log("")
+	    for(var i=0;i<10;i++){
+	    	if(moalpha[i] <= 0.3){
+	    		ctx.drawImage(atp,mox[i]-cx,moy[i]-cy,60,50);
+	    	}
+	    	else if(mox[i] != -1){
+	    		ctx.globalAlpha = moalpha[i];
+	    		ctx.drawImage(comida,mox[i]-cx,moy[i]-cy,20,20);
+	    	}
+	    }
+	    ctx.globalAlpha = 1;
+
+	    //update do enemy
+	    if(ex<px)
+	        ex+=8;
+	    else if(ex>px)
+	        ex-=8;
+	    if(ey<py)
+	        ey+=8;
+	    else if(ey>py)
+	        ey-=8;
+	    //if(Math.abs(ex-px)<300 && Math.abs(ey-py)<300)
+	    ctx.drawImage(enemy,ex-cx,ey-cy,100,100);
+
+	    ctx.fillStyle="green";
+	    ctx.fillRect(0,0,canv.width,50);
+	    ctx.fillStyle ="black";
+	    ctx.font="20px Calibri";
+	    hudtext = "ATP: " + 2*pontos;
+	    ctx.fillText(hudtext,25,30);
+
+
+	    if(ex>=px-90 && ex<=px+70 && ey>=py-90 && ey<=py+70){//o certo e 100 e 80
+	    	document.getElementById("xd").innerHTML = "gameover";
+	    	stage = 0;
+	    }
+	    if(pontos >= 20){
+	    	stage = 3;
+	    }
+	    //ctx.fillRect(px*step,py*step,20,20);
+	}
+}
+function keyPush(evt) {
+    switch(evt.keyCode) {
+        case 37:
+            xv=-1;
+            break;
+        case 38:
+            yv=-1;
+            break;
+        case 39:
+            xv=1;
+            break;
+        case 40:
+            yv=1;
+            break;
+    }
+}
+function keyRelesed(evt) {
+    switch(evt.keyCode) {
+        case 37:
+            xv=0;
+            break;
+        case 38:
+            yv=0;
+            break;
+        case 39:
+            xv=0;
+            break;
+        case 40:
+            yv=0;
+            break;
+    }
+}
+function mouseClick(evt) {
+    //return {evt.offsetX,evt.offsetY};
+    clicou = true;
+    mousexy = evt.offsetX;
+    //mouxexy.y = evt.offsetY;
+}
+</script>

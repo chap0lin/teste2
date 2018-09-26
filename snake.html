@@ -1,0 +1,172 @@
+<!--<button onclick="myAudio.pause()">||</button>
+<button onclick="myAudio.play()">^</button>
+<br>-->
+<p id="xd"></p>
+<p id="pontuacao"></p>
+<canvas id="gc" width="900" height="600" style="margin-left: 25vw; margin-top:10vh;"></canvas>
+<script>
+window.onload=function() {
+    canv=document.getElementById("gc");
+    ctx=canv.getContext("2d");
+    document.addEventListener("keydown",keyPush);
+    document.addEventListener("keyup",keyRelesed);
+    setInterval(game,1000/15);
+}
+mox = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+moy = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+px=410;
+py=260;
+pontos = 0;
+ex=ey=0;
+step=20;
+glucoCount = 0;
+//tc=20;
+//ax=ay=15;
+xv=yv=0;
+trail=[];
+tail = 5;
+stage = 1;//1 e o nivel 1, 2 e a explicacao
+
+
+var myImage = new Image(80,80);
+myImage.src = 'c1.png';
+var enemy = new Image(80,80);
+enemy.src = 'e1.png';
+var comida = new Image(20,20);
+comida.src = 'Glicose.png';
+var fundo = new Image(1800,1500);
+fundo.src = 'back.png';
+var f1 = new Image(425,400);
+f1.src="f1.png";
+
+/*
+var myAudio = new Audio('music.mp3');
+myAudio.play();*/
+
+function game() {
+	if(stage == 1){
+	    px+=xv*step;
+	    py+=yv*step;
+	    if(px<410) {
+	        px=410;
+	    }
+	    if(px>1310) {
+	        px= 1310;
+	    }
+	    if(py<270) {
+	        py= 270;
+	    }
+	    if(py>1160) {
+	        py= 1160;
+	    }
+	    ctx.fillStyle="black";
+	    cx = px-410;
+	    cy = py-260;
+	    ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+	    //ctx.fillRect(0,0,canv.width,canv.height);
+	    //ctx.drawImage(myImage,ax*gs,ay*gs,gs-2,gs-2);
+	    ctx.fillStyle="green";
+	    ctx.fillRect(0,0,canv.width,50);
+	    ctx.fillStyle ="black";
+	    ctx.font="20px Georgia";
+	    hudtext = "ATP: " + 2*pontos;
+	    ctx.fillText(hudtext,25,30);
+
+
+	    ctx.drawImage(myImage,410,260,80,80);
+
+	    //colisao glicose:
+	    for(var i=0;i<10;i++){
+	    	if(mox[i]>= px && mox[i] <=px+80 && moy[i]>= py && moy[i] <=py+80){
+	    		mox[i]=-1;
+	    		moy[i]=-1;
+	    		glucoCount--;
+	    		pontos++;
+	    		break;
+	    	}
+	    }
+
+	    //spawn de glicose
+	    if(glucoCount<8)
+	    {
+	    	if(Math.random()>0.96 || glucoCount == 0){
+	    		//spawna
+	    		for(var i=0;i<10;i++){
+	    			if(mox[i] == -1)
+	    				break;
+	    		}
+	    		mox[i] = (Math.random()*10000)%880 + 420;
+	    		moy[i] = (Math.random()*10000)%890 + 270;
+	    		glucoCount++;
+	    	}
+	    }
+	    document.getElementById("xd").innerHTML = glucoCount;
+	    document.getElementById("pontuacao").innerHTML = pontos;
+	    //console.log("")
+	    for(var i=0;i<10;i++){
+	    	if(mox[i] != -1){
+	    		ctx.drawImage(comida,mox[i]-cx,moy[i]-cy,20,20);
+	    	}
+	    }
+
+	    //update do enemy
+	    if(ex<px)
+	        ex+=5;
+	    else if(ex>px)
+	        ex-=5;
+	    if(ey<py)
+	        ey+=5;
+	    else if(ey>py)
+	        ey-=5;
+	    //if(Math.abs(ex-px)<300 && Math.abs(ey-py)<300)
+	    ctx.drawImage(enemy,ex-cx,ey-cy,100,100);
+
+	    if(ex>=px-90 && ex<=px+70 && ey>=py-90 && ey<=py+70){//o certo e 100 e 80
+	    	document.getElementById("xd").innerHTML = "gameover";
+	    }
+	    if(pontos >= 20){
+	    	stage = 2;
+	    }
+	    //ctx.fillRect(px*step,py*step,20,20);
+	}else if(stage == 2){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f1,237.5,100,425,400);
+	}
+}
+function keyPush(evt) {
+    switch(evt.keyCode) {
+        case 37:
+            xv=-1;
+            break;
+        case 38:
+            yv=-1;
+            break;
+        case 39:
+            xv=1;
+            break;
+        case 40:
+            yv=1;
+            break;
+    }
+}
+function keyRelesed(evt) {
+    switch(evt.keyCode) {
+        case 37:
+            xv=0;
+            break;
+        case 38:
+            yv=0;
+            break;
+        case 39:
+            xv=0;
+            break;
+        case 40:
+            yv=0;
+            break;
+    }
+}
+</script>
