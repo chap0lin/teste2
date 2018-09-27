@@ -1,0 +1,870 @@
+<!--<button onclick="myAudio.pause()">||</button>
+<button onclick="myAudio.play()">^</button>
+<br>-->
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF8">
+</head>
+<p id="xd"></p>
+<p id="pontuacao"></p>
+<canvas id="gc" width="900" height="600" style="margin-left: 25vw; margin-top:10vh;border:1px solid black;"></canvas>
+<script>
+window.onload=function() {
+    canv=document.getElementById("gc");
+    ctx=canv.getContext("2d");
+    document.addEventListener("keydown",keyPush);
+    document.addEventListener("keyup",keyRelesed);
+    canv.addEventListener("mousedown",mouseClick);
+    setInterval(game,1000/15);
+}
+mox = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+moy = [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+moalpha = [1,1,1,1,1,1,1,1,1,1];
+px=410;
+py=260;
+pontos = 0;
+ex=0;
+ey=50;
+step=20;
+glucoCount = 0;
+//tc=20;
+//ax=ay=15;
+xv=yv=0;
+trail=[];
+tail = 5;
+clicou = false;
+var mousexy;
+stage = 0;//1 e o nivel 1, 2 e a explicacao
+
+var title = new Image(425,400);
+title.src = 'title.png';
+var b1 = new Image(100,60);
+b1.src = 'b1.png';
+var b2 = new Image(100,60);
+b2.src = 'b2.png';
+var b3 = new Image(100,60);
+b3.src = 'b3.png';
+var b4 = new Image(100,60);
+b4.src = 'b4.png';
+
+var myImage = new Image(80,80);
+myImage.src = 'c1.png';
+var enemy = new Image(80,80);
+enemy.src = 'e1.png';
+var comida = new Image(20,20);
+comida.src = 'Glicose.png';
+var fundo = new Image(1800,1500);
+fundo.src = 'back.png';
+
+var f0 = new Image(425,400);//As primeiras células formadas ...
+f0.src="f0.png";
+var f1 = new Image(425,400);//Principais tipos de fermentação
+f1.src="f1.png";
+var f2 = new Image(425,200);//Processos energéticos anaeróbicos ...
+f2.src = "f2.png";
+var f3 = new Image(425,200);//Fuja do inimigo
+f3.src = "f3.png";
+var f4 = new Image(425,200);//Explicando que ocorreu fermentação
+f4.src = "f4.png";
+var f5 = new Image(425,200);//Células eucariontes originaram-se ...
+f5.src = "f5.png";
+var f6 = new Image(425,200);//A principal pressao seletiva ...
+f6.src = "f6.png";
+var f7 = new Image(425,200);//O oxigênio será tóxico ...
+f7.src = "f7.png";
+var f8 = new Image(425,200);//Origem das mitocôndrias ...
+f8.src = "f8.png";
+var f9 = new Image(425,200);//Equação da respiração aeróbica ...
+f9.src = "f9.png";
+
+
+var atp = new Image(30,26);
+atp.src = "atp.png";
+var o1 = new Image(425,200);
+o1.src = "o1.png";
+var o2 = new Image(425,200);
+o2.src = "o2.png";
+var o3 = new Image(425,200);
+o3.src = "o3.png";
+var o1c = new Image(425,200);
+o1c.src = "o1c.png";
+var o2c = new Image(425,200);
+o2c.src = "o2c.png";
+var o3c = new Image(425,200);
+o3c.src = "o3c.png";
+fade = 1;
+var next = new Image(60,35);
+next.src = "next.png";
+/*
+var myAudio = new Audio('music.mp3');
+myAudio.play();*/
+
+function game() {
+	if(stage == 0){//tela inicial
+		ctx.fillStyle="white";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		//ctx.globalAlpha = 0.45;
+		//ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		//ctx.globalAlpha = 1;
+		//ctx.fillStyle ="white";
+	    //ctx.font="40px Calibri";
+	    //hudtext = "Menu";
+	    //ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(title,150,50,600,400);
+	    ctx.drawImage(b1,150,500,120,60);
+	    ctx.drawImage(b2,310,500,120,60);
+	    ctx.drawImage(b3,470,500,120,60);
+	    ctx.drawImage(b4,630,500,120,60);
+	    if(clicou && mousexy == 'jogar'){
+	    	stage = 10;
+	    	clicou = false;
+	    }
+	}else if(stage == 10){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f0,237.5,100,425,400);
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 11;
+	    	clicou = false;
+	    }
+	}else if(stage == 11){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f3,237.5,100,425,400);
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 12;
+	    	clicou = false;
+	    }
+	}else if(stage == 12){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle = "white";
+		ctx.fillRect(200,80,500,450);
+		ctx.drawImage(f2,220,100,460,200);
+		if(fade >=0.1){
+			ctx.globalAlpha = fade;
+			ctx.drawImage(comida,410,350,80,80);
+			ctx.globalAlpha = 1;
+			fade -= 0.05;
+		}else{
+			ctx.drawImage(atp,400,350,100,80);
+		}
+		ctx.drawImage(next,820,560,70,35);
+
+	    if(clicou && mousexy == 'next'){
+	    	stage = 13;
+	    	clicou = false;
+	    }
+	}else if(stage == 13){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o1,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 14;
+	    	clicou = false;
+	    }
+	}else if(stage == 14){//fase 1
+		px+=xv*step;
+	    py+=yv*step;
+	    if(px<410)
+	        px=410;
+	    if(px>1310)
+	        px= 1310;
+	    if(py<270)
+	        py= 270;
+	    if(py>1160)
+	        py= 1160;
+
+	    ctx.fillStyle="black";
+	    cx = px-410;
+	    cy = py-260;
+	    ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+	    ctx.drawImage(myImage,410,260,80,80);
+	    //colisao glicose:
+	    for(var i=0;i<10;i++){
+	    	if(mox[i]>= px && mox[i] <=px+80 && moy[i]>= py && moy[i] <=py+80){
+	    		moalpha[i] = 0.9;
+	    		break;
+	    	}
+	    	if(moalpha[i]!=1){
+	    		moalpha[i]-=0.1;
+	    		if(moalpha[i]<=0){
+	    			mox[i]=-1;
+	    			moy[i]=-1;
+	    			pontos++;
+	    			moalpha[i]=1;
+	    			glucoCount--;
+	    		}
+	    	}
+	    }
+	    //spawn de glicose
+	    if(glucoCount<8){
+	    	if(Math.random()>0.96 || glucoCount == 0){
+	    		//spawna
+	    		for(var i=0;i<10;i++){
+	    			if(mox[i] == -1)
+	    				break;
+	    		}
+	    		mox[i] = (Math.random()*10000)%880 + 420;
+	    		moy[i] = (Math.random()*10000)%890 + 270;
+	    		glucoCount++;
+	    	}
+	    }
+	    //document.getElementById("xd").innerHTML = glucoCount;
+	    //document.getElementById("pontuacao").innerHTML = pontos;
+	    for(var i=0;i<10;i++){
+	    	if(moalpha[i] <= 0.3){
+	    		ctx.drawImage(atp,mox[i]-cx,moy[i]-cy,60,50);
+	    	}else if(mox[i] != -1){
+	    		ctx.globalAlpha = moalpha[i];
+	    		ctx.drawImage(comida,mox[i]-cx,moy[i]-cy,20,20);
+	    	}
+	    }
+	    ctx.globalAlpha = 1;
+	    //update do enemy
+	    if(ex<px)
+	        ex+=5;
+	    else if(ex>px)
+	        ex-=5;
+	    if(ey<py)
+	        ey+=5;
+	    else if(ey>py)
+	        ey-=5;
+	    //if(Math.abs(ex-px)<300 && Math.abs(ey-py)<300)
+	    ctx.drawImage(enemy,ex-cx,ey-cy,100,100);
+
+	    ctx.fillStyle="green";
+	    ctx.fillRect(0,0,canv.width,50);
+	    ctx.fillStyle ="black";
+	    ctx.font="20px Calibri";
+	    hudtext = "ATP: " + 2*pontos;
+	    ctx.fillText(hudtext,25,30);
+
+	    if(ex>=px-90 && ex<=px+70 && ey>=py-90 && ey<=py+70){//o certo e 100 e 80
+	    	//document.getElementById("xd").innerHTML = "gameover";
+	    	stage = 19;
+	    }
+	    if(pontos >= 5){
+	    	stage = 15;
+	    	pontos = 0;
+	    	ex=0;
+			ey=50;
+			px=410;
+			py=260;
+	    }
+	}else if(stage == 15){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o1c,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 20;
+	    	clicou = false;
+	    }
+	}else if(stage == 19){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Perdeu o Jogo (1ºFase)";
+	    ctx.fillText(hudtext,200,200);
+	    if(clicou){
+	    	stage = 14;
+	    	px=410;
+			py=260;
+			pontos = 0;
+			ex=0;
+			ey=50;
+	    	clicou = false;
+	    }
+	}else if(stage == 20){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f4,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 21;
+	    	clicou = false;
+	    }
+	}else if(stage == 21){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f1,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 22;
+	    	clicou = false;
+	    }
+	}else if(stage == 22){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o2,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 23;
+	    	clicou = false;
+	    }
+	}else if(stage == 23){//fase 2
+		px+=xv*step;
+	    py+=yv*step;
+	    if(px<410)
+	        px=410;
+	    if(px>1310)
+	        px= 1310;
+	    if(py<270)
+	        py= 270;
+	    if(py>1160)
+	        py= 1160;
+
+	    ctx.fillStyle="black";
+	    cx = px-410;
+	    cy = py-260;
+	    ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+	    ctx.drawImage(myImage,410,260,80,80);
+	    //colisao glicose:
+	    for(var i=0;i<10;i++){
+	    	if(mox[i]>= px && mox[i] <=px+80 && moy[i]>= py && moy[i] <=py+80){
+	    		moalpha[i] = 0.9;
+	    		break;
+	    	}
+	    	if(moalpha[i]!=1){
+	    		moalpha[i]-=0.1;
+	    		if(moalpha[i]<=0){
+	    			mox[i]=-1;
+	    			moy[i]=-1;
+	    			pontos++;
+	    			moalpha[i]=1;
+	    			glucoCount--;
+	    		}
+	    	}
+	    }
+	    //spawn de glicose
+	    if(glucoCount<8){
+	    	if(Math.random()>0.96 || glucoCount == 0){
+	    		//spawna
+	    		for(var i=0;i<10;i++){
+	    			if(mox[i] == -1)
+	    				break;
+	    		}
+	    		mox[i] = (Math.random()*10000)%880 + 420;
+	    		moy[i] = (Math.random()*10000)%890 + 270;
+	    		glucoCount++;
+	    	}
+	    }
+	    //document.getElementById("xd").innerHTML = glucoCount;
+	    //document.getElementById("pontuacao").innerHTML = pontos;
+	    for(var i=0;i<10;i++){
+	    	if(moalpha[i] <= 0.3){
+	    		ctx.drawImage(atp,mox[i]-cx,moy[i]-cy,60,50);
+	    	}else if(mox[i] != -1){
+	    		ctx.globalAlpha = moalpha[i];
+	    		ctx.drawImage(comida,mox[i]-cx,moy[i]-cy,20,20);
+	    	}
+	    }
+	    ctx.globalAlpha = 1;
+	    //update do enemy
+	    if(ex<px)
+	        ex+=8;
+	    else if(ex>px)
+	        ex-=8;
+	    if(ey<py)
+	        ey+=8;
+	    else if(ey>py)
+	        ey-=8;
+	    //if(Math.abs(ex-px)<300 && Math.abs(ey-py)<300)
+	    ctx.drawImage(enemy,ex-cx,ey-cy,100,100);
+
+	    ctx.fillStyle="green";
+	    ctx.fillRect(0,0,canv.width,50);
+	    ctx.fillStyle ="black";
+	    ctx.font="20px Calibri";
+	    hudtext = "ATP: " + 2*pontos;
+	    ctx.fillText(hudtext,25,30);
+
+	    if(ex>=px-90 && ex<=px+70 && ey>=py-90 && ey<=py+70){//o certo e 100 e 80
+	    	//document.getElementById("xd").innerHTML = "gameover";
+	    	stage = 29;
+	    }
+	    if(pontos >= 5){
+	    	stage = 24;
+	    	pontos = 0;
+	    	ex=0;
+			ey=50;
+			px=410;
+			py=260;
+	    }
+
+	}else if(stage == 24){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o2c,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 30;
+	    	clicou = false;
+	    }
+	}else if(stage == 29){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Perdeu o Jogo (2ºFase)";
+	    ctx.fillText(hudtext,200,200);
+	    if(clicou){
+	    	stage = 23;
+	    	px=410;
+			py=260;
+			pontos = 0;
+			ex=0;
+			ey=50;
+	    	clicou = false;
+	    }
+	}else if(stage == 30){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f5,237.5,100,425,400);
+		//adição da carioteca
+		myImage.src = 'c2.png';
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 31;
+	    	clicou = false;
+	    }
+	}else if(stage == 31){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f8,237.5,100,425,400);
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 32;
+	    	clicou = false;
+	    }
+	}else if(stage == 32){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f6,237.5,100,425,400);
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 33;
+	    	clicou = false;
+	    }
+	}else if(stage == 33){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f7,237.5,100,425,400);
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 34;
+	    	clicou = false;
+	    }
+	}else if(stage == 34){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f9,237.5,100,425,400);
+		//respiracao aerobica 38atp
+		atp.src = "atp2.png";
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 35;
+	    	clicou = false;
+	    }
+	}else if(stage == 35){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o3,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 36;
+	    	clicou = false;
+	    }
+	}else if(stage == 36){//fase 3
+		px+=xv*step;
+	    py+=yv*step;
+	    if(px<410)
+	        px=410;
+	    if(px>1310)
+	        px= 1310;
+	    if(py<270)
+	        py= 270;
+	    if(py>1160)
+	        py= 1160;
+
+	    ctx.fillStyle="black";
+	    cx = px-410;
+	    cy = py-260;
+	    ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
+	    ctx.drawImage(myImage,410,260,80,80);
+	    //colisao glicose:
+	    for(var i=0;i<10;i++){
+	    	if(mox[i]>= px && mox[i] <=px+80 && moy[i]>= py && moy[i] <=py+80){
+	    		moalpha[i] = 0.9;
+	    		break;
+	    	}
+	    	if(moalpha[i]!=1){
+	    		moalpha[i]-=0.1;
+	    		if(moalpha[i]<=0){
+	    			mox[i]=-1;
+	    			moy[i]=-1;
+	    			pontos++;
+	    			moalpha[i]=1;
+	    			glucoCount--;
+	    		}
+	    	}
+	    }
+	    //spawn de glicose
+	    if(glucoCount<8){
+	    	if(Math.random()>0.96 || glucoCount == 0){
+	    		//spawna
+	    		for(var i=0;i<10;i++){
+	    			if(mox[i] == -1)
+	    				break;
+	    		}
+	    		mox[i] = (Math.random()*10000)%880 + 420;
+	    		moy[i] = (Math.random()*10000)%890 + 270;
+	    		glucoCount++;
+	    	}
+	    }
+	    //document.getElementById("xd").innerHTML = glucoCount;
+	    //document.getElementById("pontuacao").innerHTML = pontos;
+	    for(var i=0;i<10;i++){
+	    	if(moalpha[i] <= 0.3){
+	    		ctx.drawImage(atp,mox[i]-cx,moy[i]-cy,60,50);
+	    	}else if(mox[i] != -1){
+	    		ctx.globalAlpha = moalpha[i];
+	    		ctx.drawImage(comida,mox[i]-cx,moy[i]-cy,20,20);
+	    	}
+	    }
+	    ctx.globalAlpha = 1;
+	    //update do enemy
+	    if(ex<px)
+	        ex+=8;
+	    else if(ex>px)
+	        ex-=8;
+	    if(ey<py)
+	        ey+=8;
+	    else if(ey>py)
+	        ey-=8;
+	    //if(Math.abs(ex-px)<300 && Math.abs(ey-py)<300)
+	    ctx.drawImage(enemy,ex-cx,ey-cy,100,100);
+
+	    ctx.fillStyle="green";
+	    ctx.fillRect(0,0,canv.width,50);
+	    ctx.fillStyle ="black";
+	    ctx.font="20px Calibri";
+	    hudtext = "ATP: " + 38*pontos;
+	    ctx.fillText(hudtext,25,30);
+
+	    if(ex>=px-90 && ex<=px+70 && ey>=py-90 && ey<=py+70){//o certo e 100 e 80
+	    	//document.getElementById("xd").innerHTML = "gameover";
+	    	stage = 39;
+	    }
+	    if(pontos >= 5){
+	    	stage = 37;
+	    	pontos = 0;
+	    	ex=0;
+			ey=50;
+			px=410;
+			py=260;
+	    }
+	}else if(stage == 37){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o3c,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 60;//40 depois
+	    	clicou = false;
+	    }
+	}else if(stage == 39){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Perdeu o Jogo (3ºFase)";
+	    ctx.fillText(hudtext,200,200);
+	    if(clicou){
+	    	stage = 36;
+	    	px=410;
+			py=260;
+			pontos = 0;
+			ex=0;
+			ey=50;
+	    	clicou = false;
+	    }
+	}else if(stage == 40){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Introdução aos radicais livres peroxixomos";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 41;
+	    	clicou = false;
+	    }
+	}else if(stage == 41){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Mais uma imagem de introdução";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 42;
+	    	clicou = false;
+	    }
+	}else if(stage == 42){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Objetivo 4";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 43;
+	    	clicou = false;
+	    }
+	}else if(stage == 43){//fase 4
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Fase 4";
+	    ctx.fillText(hudtext,200,200);
+	    if(clicou){
+	    	stage = 44;
+	    	clicou = false;
+	    }
+	}else if(stage == 44){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Objetivo 4 Concluido";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 50;
+	    	clicou = false;
+	    }
+	}else if(stage == 50){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Introdução aos lisossomos";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 51;
+	    	clicou = false;
+	    }
+	}else if(stage == 51){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Mais um de introdução";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 52;
+	    	clicou = false;
+	    }
+	}else if(stage == 52){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Objetivo 5";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 53;
+	    	clicou = false;
+	    }
+	}else if(stage == 53){//fase 5
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Fase 5";
+	    ctx.fillText(hudtext,200,200);
+	    if(clicou){
+	    	stage = 54;
+	    	clicou = false;
+	    }
+	}else if(stage == 54){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Objetivo 5 Concluido";
+	    ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 60;
+	    	clicou = false;
+	    }
+	}else if(stage == 60){//fim de jogo
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.fillStyle ="white";
+	    ctx.font="40px Calibri";
+	    hudtext = "Fim de jogo";
+	    ctx.fillText(hudtext,200,200);
+	    if(clicou){
+	    	stage = 0;
+	    	clicou = false;
+	    }
+	}else if(stage == 61){
+
+	}
+}
+function keyPush(evt) {
+    switch(evt.keyCode) {
+        case 37:
+            xv=-1;
+            break;
+        case 38:
+            yv=-1;
+            break;
+        case 39:
+            xv=1;
+            break;
+        case 40:
+            yv=1;
+            break;
+    }
+}
+function keyRelesed(evt) {
+    switch(evt.keyCode) {
+        case 37:
+            xv=0;
+            break;
+        case 38:
+            yv=0;
+            break;
+        case 39:
+            xv=0;
+            break;
+        case 40:
+            yv=0;
+            break;
+    }
+}
+function mouseClick(evt) {
+    //return {evt.offsetX,evt.offsetY};
+    if(evt.offsetX>=820 && evt.offsetX <= 890 && evt.offsetY >= 560 && evt.offsetY <=595)
+    	mousexy = 'next';
+    else if(evt.offsetX>=150 && evt.offsetX <= 270 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'jogar';
+    else if(evt.offsetX>=310 && evt.offsetX <= 430 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'endless';
+    else if(evt.offsetX>=470 && evt.offsetX <= 590 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'instrucao';
+    else if(evt.offsetX>=630 && evt.offsetX <= 750 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'creditos';
+    else{
+    	mousexy = 'none';
+    }
+    clicou = true;
+    //mousexy = evt.offsetX;
+    //mouxexy.y = evt.offsetY;
+}
+</script>

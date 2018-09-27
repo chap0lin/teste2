@@ -6,7 +6,7 @@
 </head>
 <p id="xd"></p>
 <p id="pontuacao"></p>
-<canvas id="gc" width="900" height="600" style="margin-left: 25vw; margin-top:10vh;"></canvas>
+<canvas id="gc" width="900" height="600" style="margin-left: 25vw; margin-top:10vh;border:1px solid black;"></canvas>
 <script>
 window.onload=function() {
     canv=document.getElementById("gc");
@@ -35,6 +35,16 @@ clicou = false;
 var mousexy;
 stage = 0;//1 e o nivel 1, 2 e a explicacao
 
+var title = new Image(425,400);
+title.src = 'title.png';
+var b1 = new Image(100,60);
+b1.src = 'b1.png';
+var b2 = new Image(100,60);
+b2.src = 'b2.png';
+var b3 = new Image(100,60);
+b3.src = 'b3.png';
+var b4 = new Image(100,60);
+b4.src = 'b4.png';
 
 var myImage = new Image(80,80);
 myImage.src = 'c1.png';
@@ -53,8 +63,8 @@ var f2 = new Image(425,200);//Processos energéticos anaeróbicos ...
 f2.src = "f2.png";
 var f3 = new Image(425,200);//Fuja do inimigo
 f3.src = "f3.png";
-//var f4 = new Image(425,200);//Explicando que ocorreu fermentação
-//f4.src = "f4.png";
+var f4 = new Image(425,200);//Explicando que ocorreu fermentação
+f4.src = "f4.png";
 var f5 = new Image(425,200);//Células eucariontes originaram-se ...
 f5.src = "f5.png";
 var f6 = new Image(425,200);//A principal pressao seletiva ...
@@ -90,16 +100,21 @@ myAudio.play();*/
 
 function game() {
 	if(stage == 0){//tela inicial
-		ctx.fillStyle="black";
+		ctx.fillStyle="white";
 		ctx.fillRect(0,0,canv.width,canv.height);
-		ctx.globalAlpha = 0.45;
-		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
-		ctx.globalAlpha = 1;
-		ctx.fillStyle ="white";
-	    ctx.font="40px Calibri";
-	    hudtext = "Menu";
-	    ctx.fillText(hudtext,200,200);
-	    if(clicou){
+		//ctx.globalAlpha = 0.45;
+		//ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		//ctx.globalAlpha = 1;
+		//ctx.fillStyle ="white";
+	    //ctx.font="40px Calibri";
+	    //hudtext = "Menu";
+	    //ctx.fillText(hudtext,200,200);
+	    ctx.drawImage(title,150,50,600,400);
+	    ctx.drawImage(b1,150,500,120,60);
+	    ctx.drawImage(b2,310,500,120,60);
+	    ctx.drawImage(b3,470,500,120,60);
+	    ctx.drawImage(b4,630,500,120,60);
+	    if(clicou && mousexy == 'jogar'){
 	    	stage = 10;
 	    	clicou = false;
 	    }
@@ -288,7 +303,7 @@ function game() {
 		ctx.globalAlpha = 0.45;
 		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
 		ctx.globalAlpha = 1;
-		ctx.drawImage(f1,237.5,100,425,400);
+		ctx.drawImage(f4,237.5,100,425,400);
 	    ctx.drawImage(next,820,560,70,35);
 	    if(clicou && mousexy == 'next'){
 	    	stage = 21;
@@ -298,15 +313,27 @@ function game() {
 		ctx.fillStyle="black";
 		ctx.fillRect(0,0,canv.width,canv.height);
 		ctx.globalAlpha = 0.45;
-		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.drawImage(fundo,cx,cy,canv.width,canv.height,0,0,canv.width,canv.height);
 		ctx.globalAlpha = 1;
-		ctx.drawImage(o2,237.5,100,425,400);
+		ctx.drawImage(f1,237.5,100,425,400);
 	    ctx.drawImage(next,820,560,70,35);
 	    if(clicou && mousexy == 'next'){
 	    	stage = 22;
 	    	clicou = false;
 	    }
-	}else if(stage == 22){//fase 2
+	}else if(stage == 22){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(o2,237.5,100,425,400);
+	    ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
+	    	stage = 23;
+	    	clicou = false;
+	    }
+	}else if(stage == 23){//fase 2
 		px+=xv*step;
 	    py+=yv*step;
 	    if(px<410)
@@ -388,7 +415,7 @@ function game() {
 	    	stage = 29;
 	    }
 	    if(pontos >= 5){
-	    	stage = 23;
+	    	stage = 24;
 	    	pontos = 0;
 	    	ex=0;
 			ey=50;
@@ -396,7 +423,7 @@ function game() {
 			py=260;
 	    }
 
-	}else if(stage == 23){
+	}else if(stage == 24){
 		ctx.fillStyle="black";
 		ctx.fillRect(0,0,canv.width,canv.height);
 		ctx.globalAlpha = 0.45;
@@ -419,7 +446,7 @@ function game() {
 	    hudtext = "Perdeu o Jogo (2ºFase)";
 	    ctx.fillText(hudtext,200,200);
 	    if(clicou){
-	    	stage = 22;
+	    	stage = 23;
 	    	px=410;
 			py=260;
 			pontos = 0;
@@ -825,6 +852,14 @@ function mouseClick(evt) {
     //return {evt.offsetX,evt.offsetY};
     if(evt.offsetX>=820 && evt.offsetX <= 890 && evt.offsetY >= 560 && evt.offsetY <=595)
     	mousexy = 'next';
+    else if(evt.offsetX>=150 && evt.offsetX <= 270 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'jogar';
+    else if(evt.offsetX>=310 && evt.offsetX <= 430 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'endless';
+    else if(evt.offsetX>=470 && evt.offsetX <= 590 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'instrucao';
+    else if(evt.offsetX>=630 && evt.offsetX <= 750 && evt.offsetY >= 500 && evt.offsetY <=560)
+    	mousexy = 'creditos';
     else{
     	mousexy = 'none';
     }
