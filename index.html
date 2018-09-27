@@ -75,6 +75,8 @@ var f8 = new Image(425,200);//Origem das mitocôndrias ...
 f8.src = "f8.png";
 var f9 = new Image(425,200);//Equação da respiração aeróbica ...
 f9.src = "f9.png";
+var f10 = new Image(425,200);//imagem da celula com mitocondria
+f10.src = "f10.png";
 
 
 var atp = new Image(30,26);
@@ -477,6 +479,18 @@ function game() {
 		ctx.drawImage(f8,237.5,100,425,400);
 		ctx.drawImage(next,820,560,70,35);
 	    if(clicou && mousexy == 'next'){
+	    	stage = 31.5;
+	    	clicou = false;
+	    }
+	}else if(stage == 31.5){
+		ctx.fillStyle="black";
+		ctx.fillRect(0,0,canv.width,canv.height);
+		ctx.globalAlpha = 0.45;
+		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
+		ctx.globalAlpha = 1;
+		ctx.drawImage(f10,237.5,100,425,400);
+		ctx.drawImage(next,820,560,70,35);
+	    if(clicou && mousexy == 'next'){
 	    	stage = 32;
 	    	clicou = false;
 	    }
@@ -629,6 +643,7 @@ function game() {
 	    ctx.drawImage(next,820,560,70,35);
 	    if(clicou && mousexy == 'next'){
 	    	clicou = false;
+	    	stage = 60;
 	    }
 	}else if(stage == 39){
 		ctx.fillStyle="black";
