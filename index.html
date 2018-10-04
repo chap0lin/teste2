@@ -96,6 +96,8 @@ o3c.src = "o3c.png";
 fade = 1;
 var next = new Image(60,35);
 next.src = "next.png";
+var end = new Image(60,35);
+end.src = "end.png";
 /*
 var myAudio = new Audio('music.mp3');
 myAudio.play();*/
@@ -118,6 +120,9 @@ function game() {
 	    ctx.drawImage(b4,630,500,120,60);
 	    if(clicou && mousexy == 'jogar'){
 	    	stage = 10;
+	    	clicou = false;
+	    }else if(clicou && mousexy == 'creditos'){
+	    	stage = 60;
 	    	clicou = false;
 	    }
 	}else if(stage == 10){
@@ -813,15 +818,7 @@ function game() {
 	    	clicou = false;
 	    }
 	}else if(stage == 60){//fim de jogo
-		ctx.fillStyle="black";
-		ctx.fillRect(0,0,canv.width,canv.height);
-		ctx.globalAlpha = 0.45;
-		ctx.drawImage(fundo,0,0,canv.width,canv.height,0,0,canv.width,canv.height);
-		ctx.globalAlpha = 1;
-		ctx.fillStyle ="white";
-	    ctx.font="40px Calibri";
-	    hudtext = "Fim de jogo";
-	    ctx.fillText(hudtext,200,200);
+		ctx.drawImage(end,0,0,canv.width,canv.height);
 	    if(clicou){
 	    	stage = 0;
 	    	clicou = false;
